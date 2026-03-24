@@ -1,0 +1,21 @@
+package com.danh.core_network.resource
+
+import com.danh.core_network.resource.login.LoginApi
+import com.google.gson.GsonBuilder
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+object RetrofitHelper {
+    private val BASE_URL="http://10.0.2.2:3000/"
+    private val gson by lazy {
+        GsonBuilder().create()
+    }
+    private val retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+    }
+    val useApi: LoginApi by lazy {
+        retrofit.build().create(LoginApi::class.java)
+    }
+}

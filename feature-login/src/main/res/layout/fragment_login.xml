@@ -1,236 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
+    android:padding="24dp"
     android:fillViewport="true">
 
-    <LinearLayout
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_gravity="start"
+        android:layout_marginTop="24dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="logo"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:text="Đăng nhập"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgLogo" />
+
+    <TextView
+        android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="28dp"
-        android:paddingBottom="24dp">
+        android:layout_marginTop="24dp"
+        android:text="Tên tài khoản:"
+        android:textSize="30dp"
 
-        <ImageView
-            android:id="@+id/imgLogo"
-            android:layout_width="150dp"
-            android:layout_height="48dp"
-            android:layout_gravity="start"
-            android:adjustViewBounds="true"
-            android:contentDescription="logo"
-            android:scaleType="fitCenter"
-            android:src="@drawable/logo" />
+        app:layout_constraintEnd_toEndOf="@+id/textView3"
+        app:layout_constraintStart_toStartOf="@+id/textView3"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="36dp"
-            android:text="Sign up"
-            android:textColor="#1F1F1F"
-            android:textSize="24sp"
-            android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tvEmailLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="Email"
-            android:textColor="#7A7A7A"
-            android:textSize="12sp" />
+    <EditText
+        android:id="@+id/edit_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_edittext"
+        android:textSize="30dp"
+        android:hint="admin@gmail.com"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/textView2"
+        app:layout_constraintStart_toStartOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-        <EditText
-            android:id="@+id/edtEmail"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/bg_edittext"
-            android:hint="Loisbecket@gmail.com"
-            android:inputType="textEmailAddress"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:textColor="#111111"
-            android:textColorHint="#111111"
-            android:textSize="14sp" />
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Mật khâu:"
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="@+id/edit_user"
+        app:layout_constraintStart_toStartOf="@+id/edit_user"
+        app:layout_constraintTop_toBottomOf="@+id/edit_user" />
 
-        <TextView
-            android:id="@+id/tvPasswordLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Password"
-            android:textColor="#7A7A7A"
-            android:textSize="12sp" />
+    <EditText
+        android:id="@+id/edit_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_edittext"
+        android:hint="********"
+        android:padding="10dp"
+        android:textSize="30dp"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="@+id/textView5"
+        app:layout_constraintStart_toStartOf="@+id/textView5"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/bg_edittext"
-            android:paddingStart="14dp"
-            android:paddingEnd="10dp">
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/bg_button_gradient"
+        android:padding="10dp"
+        android:text="Đăng nhập"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="@+id/edit_password"
+        app:layout_constraintStart_toStartOf="@+id/edit_password"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-            <EditText
-                android:id="@+id/edtPassword"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_toStartOf="@id/ivTogglePassword"
-                android:background="@android:color/transparent"
-                android:hint="********"
-                android:inputType="textPassword"
-                android:textColor="#111111"
-                android:textColorHint="#111111"
-                android:textSize="14sp" />
 
-            <ImageView
-                android:id="@+id/ivTogglePassword"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="toggle password"
-                android:src="@android:drawable/ic_menu_view"
-                app:tint="#9E9E9E" />
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/tvForgotPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="10dp"
-            android:text="Forgot Password ?"
-            android:textColor="#3D5AFE"
-            android:textSize="12sp" />
-
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="18dp"
-            android:background="@drawable/bg_button_gradient"
-            android:text="Log In"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="normal" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#E6E6E6" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:text="Or"
-                android:textColor="#9A9A9A"
-                android:textSize="12sp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#E6E6E6" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/btnGoogle"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="18dp"
-            android:background="@drawable/bg_social_button"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
-
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:contentDescription="google"
-                android:src="@mipmap/google" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="Continue with Google"
-                android:textColor="#1F1F1F"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/btnFacebook"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_social_button"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
-
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:contentDescription="facebook"
-                android:src="@mipmap/facebook" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="Continue with Facebook"
-                android:textColor="#1F1F1F"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="90dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Don’t have an account? "
-                android:textColor="#7A7A7A"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tvSignUp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sign Up"
-                android:textColor="#3D5AFE"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-    </LinearLayout>
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
