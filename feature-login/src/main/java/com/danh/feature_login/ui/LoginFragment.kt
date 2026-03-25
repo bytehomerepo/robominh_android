@@ -1,22 +1,22 @@
 package com.danh.feature_login.ui
 
-import android.net.Uri
+import kotlinx.coroutines.delay
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.danh.feature_login.databinding.FragmentLoginBinding
 import com.danh.feature_login.viewmodel.LoginViewModel
-import com.danh.feature_login.R
-import com.danh.main.FragmentMain
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
+    private var loginStartTime = 0L
     private val viewModel: LoginViewModel by viewModels()
     private lateinit var binding: FragmentLoginBinding;
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,29 +50,54 @@ class LoginFragment : Fragment() {
                 ).show()
                 return@setOnClickListener
             }
-
+            loginStartTime = System.currentTimeMillis()
+            showLoading(true)
             viewModel.login(userName, password)
         }
     }
+    private fun showLoading(isLoading: Boolean) {
+        binding.loadingOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
 
+//        binding.btnLogin.isEnabled = !isLoading
+//        binding.editUser.isEnabled = !isLoading
+//        binding.editPassword.isEnabled = !isLoading
+
+        binding.loginContent.alpha = if (isLoading) 0.7f else 1f
+    }
     private fun observeLoginResult() {
         viewModel.loginResult.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                true -> {
-                    findNavController().navigate("myapp://main".toUri())
-                }
+            viewLifecycleOwner.lifecycleScope.launch {
+                when (result) {
+                    true -> {
+                        val elapsed = System.currentTimeMillis() - loginStartTime
+                        val remain = 1500L - elapsed
 
-                false -> {
-                    Toast.makeText(requireContext(), "Đăng nhập thất bại", Toast.LENGTH_SHORT)
-                        .show()
-                }
+                        if (remain > 0) {
+                            delay(remain)
+                            showLoading(true)
+                        }
 
-                null -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Tài khoản hoặc mật khẩu không đúng",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        showLoading(false)
+                        findNavController().navigate("myapp://main".toUri())
+                    }
+
+                    false -> {
+                        showLoading(false)
+                        Toast.makeText(
+                            requireContext(),
+                            "Đăng nhập thất bại",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    null -> {
+                        showLoading(false)
+                        Toast.makeText(
+                            requireContext(),
+                            "Tài khoản hoặc mật khẩu không đúng",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
