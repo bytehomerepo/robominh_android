@@ -13,13 +13,13 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(private val loginRepository: LoginRepository = LoginRepositoryImpl()) :
     ViewModel() {
-    private val _loginResult = MutableLiveData<Boolean?>()
-    val loginResult: MutableLiveData<Boolean?> = _loginResult
+    private val _loginResult = MutableLiveData<Login?>()
+    val loginResult: MutableLiveData<Login?> = _loginResult
      fun login(userName: String, password: String) {
         viewModelScope.launch {
             val response = loginRepository.authLogin(userName, password)
             if (response is Result.Success) {
-                _loginResult.value = response.data.success
+                _loginResult.value = response.data
             } else {
                 _loginResult.value = null;
             }
