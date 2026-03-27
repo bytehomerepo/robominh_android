@@ -11,5 +11,28 @@
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <deepLink app:uri="myapp://main" />
+        <action
+            android:id="@+id/action_fragmentMain_to_fragmentVoice"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:destination="@id/fragmentVoice" />
+        <action
+            android:id="@+id/action_fragmentMain_to_fragmentSetting"
+
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:destination="@id/fragmentSetting" />
     </fragment>
+    <fragment
+        android:id="@+id/fragmentSetting"
+        android:name="com.danh.feature_setting.FragmentSetting"
+        android:label="FragmentSetting" />
+    <fragment
+        android:id="@+id/fragmentVoice"
+        android:name="com.danh.feature_voice.FragmentVoice"
+        android:label="FragmentVoice" />
 </navigation>

@@ -18,11 +18,9 @@ class LoginRepositoryImpl : LoginRepository {
             val response = RetrofitHelper.useApi.login(request)
             if (response.isSuccessful) {
                 val data = response.body()
-                Log.d("LOGIN", "success body = $data")
                 Result.Success(response.body()!!)
             } else {
                 val errorText = response.errorBody()?.string()
-                Log.d("LOGIN", "code = ${response.code()}, error = $errorText")
                 Result.Error(Exception(response.errorBody().toString()))
             }
         }

@@ -33,6 +33,9 @@ android {
 }
 
 dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    //dataStore
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     // Gson converter

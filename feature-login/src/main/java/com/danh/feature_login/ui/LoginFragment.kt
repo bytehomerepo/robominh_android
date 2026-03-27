@@ -2,6 +2,7 @@ package com.danh.feature_login.ui
 
 import kotlinx.coroutines.delay
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import com.danh.feature_login.viewmodel.LoginViewModel
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.danh.myapplication.data.TokenManager
 import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
@@ -58,16 +60,12 @@ class LoginFragment : Fragment() {
     private fun showLoading(isLoading: Boolean) {
         binding.loadingOverlay.visibility = if (isLoading) View.VISIBLE else View.GONE
 
-//        binding.btnLogin.isEnabled = !isLoading
-//        binding.editUser.isEnabled = !isLoading
-//        binding.editPassword.isEnabled = !isLoading
-
         binding.loginContent.alpha = if (isLoading) 0.7f else 1f
     }
     private fun observeLoginResult() {
         viewModel.loginResult.observe(viewLifecycleOwner) { result ->
             viewLifecycleOwner.lifecycleScope.launch {
-                when (result) {
+                when (result?.success) {
                     true -> {
                         val elapsed = System.currentTimeMillis() - loginStartTime
                         val remain = 1500L - elapsed
@@ -78,6 +76,11 @@ class LoginFragment : Fragment() {
                         }
 
                         showLoading(false)
+
+                        result.token?.let { token ->
+                            TokenManager(requireContext()).saveToken(token)
+                        }
+
                         findNavController().navigate("myapp://main".toUri())
                     }
 

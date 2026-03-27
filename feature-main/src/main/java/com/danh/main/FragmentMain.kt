@@ -1,144 +1,34 @@
 package com.danh.main
 
-import android.Manifest
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
+import android.util.Log
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.danh.core_network.data.WebSocketManager
 import com.danh.main.databinding.FragmentMainBinding
+import com.danh.myapplication.data.TokenManager
+import kotlinx.coroutines.launch
 
 class FragmentMain : Fragment() {
-    private var speechRecognizer: SpeechRecognizer? = null
-    private var isListening = false
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val speechThresholdDb = 28f
     private lateinit var binding: FragmentMainBinding
+    private lateinit var webSocketManager: WebSocketManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
     }
 
-    private val requestPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                startListening()
-            } else {
-                Toast.makeText(requireContext(), "Chưa cấp quyền micro", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-    private fun setupViews() {
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
-        speechRecognizer?.setRecognitionListener(object : RecognitionListener {
-            override fun onReadyForSpeech(params: Bundle?) {
-                binding.txtResult.text = "Đang nghe..."
-                resetSilenceTimer()
-            }
-
-            override fun onBeginningOfSpeech() {
-                binding.txtResult.text = "Đã phát hiện bắt đầu nói..."
-                resetSilenceTimer()
-            }
-
-            override fun onRmsChanged(rmsdB: Float) {
-                if (!isListening) return
-
-                // Chỉ reset timer khi âm lượng đủ lớn để coi là giọng nói
-                if (rmsdB >= speechThresholdDb) {
-                    binding.txtResult.text = "Đang nghe... rms=$rmsdB"
-                    resetSilenceTimer()
-                }
-            }
-
-            override fun onBufferReceived(buffer: ByteArray?) {}
-
-            override fun onEndOfSpeech() {
-                binding.stop.append("\nKết thúc lời nói, đang xử lý...")
-            }
-
-            override fun onError(error: Int) {
-                isListening = false
-                handler.removeCallbacks(stopBecauseSilence)
-                binding.txtResult.text = "Lỗi speech: $error"
-            }
-
-            override fun onResults(results: Bundle?) {
-                isListening = false
-                handler.removeCallbacks(stopBecauseSilence)
-
-                val texts = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                binding.txtResult.text = texts?.firstOrNull() ?: "Không có kết quả"
-            }
-
-            override fun onPartialResults(partialResults: Bundle?) {
-                val texts = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                val text = texts?.firstOrNull()
-                if (!text.isNullOrBlank()) {
-                    binding.txtResult.text = text
-                }
-            }
-
-            override fun onEvent(eventType: Int, params: Bundle?) {}
-
-        })
-        binding.btnStart.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                startListening()
-            } else {
-                requestPermission.launch(Manifest.permission.RECORD_AUDIO)
-            }
-        }
-
-        binding.btnStop.setOnClickListener {
-            stopListening()
-        }
-
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupViews()
+        setUpViews()
+        setWebSocket()
     }
 
-    private val stopBecauseSilence = Runnable {
-        if (isListening) {
-            stopListening()
-        }
-    }
-
-    private fun startListening() {
-        if (isListening) return
-
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-            )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN")
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "vi-VN")
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
-        }
-
-        isListening = true
-        speechRecognizer?.startListening(intent)
-        resetSilenceTimer()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -149,25 +39,51 @@ class FragmentMain : Fragment() {
         binding = FragmentMainBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
+    private fun setUpViews(){
+        binding.btnVoice.setOnClickListener {
+            findNavController().navigate(R.id.action_fragmentMain_to_fragmentVoice)
 
-    private fun stopListening() {
-        isListening = false
-
-        handler.removeCallbacks(stopBecauseSilence)
-        speechRecognizer?.stopListening()
+        }
+        binding.btnSetting.setOnClickListener {
+            findNavController().navigate(R.id.action_fragmentMain_to_fragmentSetting)
+        }
     }
+    private fun setWebSocket(){
+        webSocketManager = WebSocketManager()
 
-    private fun resetSilenceTimer() {
-        handler.removeCallbacks(stopBecauseSilence)
-        handler.postDelayed(stopBecauseSilence, 200)
-        handler.postDelayed(stopBecauseSilence, 200)
-    }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val token = TokenManager(requireContext().applicationContext).getToken()
 
-    override fun onDestroy() {
-        handler.removeCallbacks(stopBecauseSilence)
-        speechRecognizer?.cancel()
-        speechRecognizer?.destroy()
-        speechRecognizer = null
-        super.onDestroy()
+            Log.d("TOKEN_MAIN", "token = $token")
+
+            webSocketManager.connect(
+                url = "ws://192.168.1.12:3000?token=$token",
+                token = token,
+                onConnected = {
+                    requireActivity().runOnUiThread {
+                        binding.txtToken?.text = "Đã kết nối WebSocket"
+                    }
+                },
+                onMessage = { message ->
+                    requireActivity().runOnUiThread {
+                        binding.txtToken?.text = message
+                    }
+                },
+                onClosed = { code, reason ->
+                    requireActivity().runOnUiThread {
+                        binding.txtToken?.text = "Đóng kết nối: $code - $reason"
+                    }
+                },
+                onFailure = { error ->
+                    requireActivity().runOnUiThread {
+                        binding.txtToken?.text = "Lỗi: ${error.message}"
+                    }
+                }
+            )
+        }
+
+        binding.txtToken?.setOnClickListener {
+            webSocketManager.sendText("Hello from ByteHome","Nam",123L,12.12)
+        }
     }
 }
