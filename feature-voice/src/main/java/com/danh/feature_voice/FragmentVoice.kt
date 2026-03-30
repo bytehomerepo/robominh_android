@@ -250,20 +250,35 @@ class FragmentVoice : Fragment() {
             override fun onError(error: Int) {
                 isListening = false
                 handler.removeCallbacks(stopBecauseNoNewText)
-                setUpViewWait()
+                Log.e("STT", "onError: $error")
+
+                val textToSend = lastText
+                lastText = ""
+
+                if (textToSend.isNotEmpty()) {
+                    // Đã gửi từ stopListening rồi, chỉ cần chờ server
+                } else {
+                    setUpViewWait()
+                }
+
+                recreateSpeechRecognizer()
             }
 
             override fun onResults(results: Bundle?) {
                 isListening = false
                 handler.removeCallbacks(stopBecauseNoNewText)
 
-//                val texts = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-//                if (lastText.isNotEmpty()) {
-//                    webSocketManager.sendText(lastText, "VI", "giongnuhanoi", 112233, 2.5f)
-//                    lastText = ""
-//                }
-////                setUpIconListen()
+                val textToSend = lastText
+                lastText = ""
 
+                if (textToSend.isNotEmpty()) {
+                    webSocketManager.sendText(textToSend, "VI", "giongnuhanoi", 112233, 2.5f)
+                } else {
+                    setUpViewWait()
+                }
+
+                // Recreate SpeechRecognizer để tránh lỗi sau nhiều lần dùng
+                recreateSpeechRecognizer()
             }
 
             override fun onPartialResults(partialResults: Bundle?) {
@@ -316,7 +331,7 @@ class FragmentVoice : Fragment() {
         handler.removeCallbacks(stopBecauseNoNewText)
         speechRecognizer?.stopListening()
         Log.d("lastText", lastText)
-        webSocketManager.sendText(lastText, "VI", "giongnuhanoi", 112233, 2.5f)
+//        webSocketManager.sendText(lastText, "VI", "giongnuhanoi", 112233, 2.5f)
     }
 
     override fun onDestroy() {
@@ -341,5 +356,11 @@ class FragmentVoice : Fragment() {
 
         binding.playerView.player = null
         super.onDestroyView()
+    }
+    private fun recreateSpeechRecognizer() {
+        speechRecognizer?.cancel()
+        speechRecognizer?.destroy()
+        speechRecognizer = null
+        setUpData() // tạo lại SpeechRecognizer mới
     }
 }
