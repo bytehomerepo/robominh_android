@@ -2,11 +2,13 @@ package com.danh.core_network.data
 
 import android.util.Log
 import okhttp3.*
+import okio.ByteString
 import org.json.JSONObject
 
 class WebSocketManager {
 
     private var webSocket: WebSocket? = null
+
     private val client = OkHttpClient.Builder()
         .retryOnConnectionFailure(true)
         .build()
@@ -15,12 +17,12 @@ class WebSocketManager {
         url: String,
         token: String? = null,
         onConnected: (() -> Unit)? = null,
-        onMessage: ((String) -> Unit)? = null,
+        onMessage: ((String) -> Unit)? = null, // raw json string
+        onReceiveText: ((type: String, text: String, audioUrl: String?) -> Unit)? = null,
         onClosed: ((Int, String) -> Unit)? = null,
         onFailure: ((Throwable) -> Unit)? = null
     ) {
-        val requestBuilder = Request.Builder()
-            .url(url)
+        val requestBuilder = Request.Builder().url(url)
 
         if (!token.isNullOrBlank()) {
             requestBuilder.addHeader("Authorization", "Bearer $token")
@@ -38,6 +40,22 @@ class WebSocketManager {
             override fun onMessage(webSocket: WebSocket, text: String) {
                 Log.d("WebSocket", "Message: $text")
                 onMessage?.invoke(text)
+                try {
+                    val json = JSONObject(text)
+                    val type = json.optString("type")
+                    val messageText = json.optString("text")
+                    val audioUrl = json.optString("audioUrl", null)
+//
+//                    receiveText(type, messageText, audioUrl)
+
+                    onReceiveText?.invoke(type, messageText, audioUrl)
+                } catch (e: Exception) {
+                    Log.e("WebSocket", "Parse message error: ${e.message}", e)
+                }
+            }
+
+            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+                Log.d("WebSocket", "Binary message size: ${bytes.size}")
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
@@ -59,13 +77,14 @@ class WebSocketManager {
 
     fun sendText(
         text: String,
+        language: String,
         voice: String,
         timestamp: Long,
-        duration: Double
+        duration: Float
     ) {
         val json = JSONObject().apply {
             put("text", text)
-            put("language", "VI")
+            put("language", language)
             put("voice", voice)
             put("timestamp", timestamp)
             put("duration", duration)
@@ -78,4 +97,10 @@ class WebSocketManager {
         webSocket?.close(1000, "Client closed")
         webSocket = null
     }
+
+//    private fun receiveText(type: String, text: String, audioUrl: String?) {
+//        Log.d("WebSocket", "type = $type")
+//        Log.d("WebSocket", "text = $text")
+//        Log.d("WebSocket", "audioUrl = $audioUrl")
+//    }
 }

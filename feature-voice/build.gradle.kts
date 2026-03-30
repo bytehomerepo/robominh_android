@@ -36,8 +36,13 @@ android {
 }
 
 dependencies {
-    implementation("androidx.media3:media3-exoplayer:1.9.3")
-    implementation("androidx.media3:media3-ui:1.9.3")
+
+
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation(project(":core-network"))
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("androidx.media3:media3-exoplayer:1.10.0")
+    implementation("androidx.media3:media3-ui:1.10.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

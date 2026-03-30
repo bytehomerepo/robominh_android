@@ -39,9 +39,7 @@ dependencies {
     implementation(project(":feature-setting"))
     implementation(project(":feature-voice"))
     implementation("io.github.kaleyravideo:android-deepfilternet:0.0.8")
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation(project(":core-network"))
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
