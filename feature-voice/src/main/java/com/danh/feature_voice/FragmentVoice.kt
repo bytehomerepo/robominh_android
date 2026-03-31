@@ -3,9 +3,6 @@ package com.danh.feature_voice
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.AudioAttributes
-import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,6 +25,8 @@ import com.danh.feature_voice.databinding.FragmentVoiceBinding
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.DefaultLoadControl
 import kotlinx.coroutines.launch
 import com.danh.core_network.data.WebSocketManager
 import com.danh.myapplication.data.TokenManager
@@ -38,7 +37,6 @@ class FragmentVoice : Fragment() {
     private var audioPlayer: ExoPlayer? = null
     private var speechRecognizer: SpeechRecognizer? = null
     private var isListening = false
-
     private val handler = Handler(Looper.getMainLooper())
     private var lastText = ""
     private var hasAnyText = false
@@ -67,7 +65,7 @@ class FragmentVoice : Fragment() {
         return binding.root
     }
 
-    private lateinit var videoUrl: Uri
+    @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initVideoPlayer()
@@ -97,6 +95,8 @@ class FragmentVoice : Fragment() {
     private fun setUpViewWait() = showVideo(R.raw.awit)
     private fun setUpIconVoice() = showVideo(R.raw.voice)
     private fun setUpIconListen() = showVideo(R.raw.listen)
+
+    @UnstableApi
     private fun setWebSocket() {
         webSocketManager = WebSocketManager()
         viewLifecycleOwner.lifecycleScope.launch {
@@ -144,7 +144,6 @@ class FragmentVoice : Fragment() {
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
                 startListening()
-
             } else {
                 requestPermission.launch(Manifest.permission.RECORD_AUDIO)
             }
@@ -161,23 +160,31 @@ class FragmentVoice : Fragment() {
 
         if (resetIcon && isAdded) {
             startListening()
-//            setUpIconListen()
         }
     }
 
+    @UnstableApi
     private fun receiveText(type: String?, text: String?, audioUrl: String?) {
         if (!audioUrl.isNullOrEmpty()) {
             Log.d("WS", "type=$type")
             Log.d("WS", "text=$text")
-            Log.d("WS", "audioUrl=$audioUrl")
+            Log.d("Đã nhận", "audioUrl=$audioUrl")
             playAudioStream(audioUrl)
         }
     }
 
+    @UnstableApi
     private fun playAudioStream(url: String) {
         stopAudioStream(resetIcon = false)
-
-        audioPlayer = ExoPlayer.Builder(requireContext()).build().also { exoPlayer ->
+        val loadControl = DefaultLoadControl.Builder()
+            .setBufferDurationsMs(
+                1000,   // minBufferMs — chỉ cần 1 giây là phát
+                10000,  // maxBufferMs
+                500,    // bufferForPlaybackMs — chỉ cần 500ms để bắt đầu
+                500     // bufferForPlaybackAfterRebufferMs
+            )
+            .build()
+        audioPlayer = ExoPlayer.Builder(requireContext()).setLoadControl(loadControl).build().also { exoPlayer ->
             val mediaItem = MediaItem.fromUri(url)
             exoPlayer.setMediaItem(mediaItem)
 
@@ -195,7 +202,7 @@ class FragmentVoice : Fragment() {
 
                         Player.STATE_ENDED -> {
                             Log.d("AudioStream", "STATE_ENDED")
-                            stopAudioStream()
+                            stopAudioStream(false)
                             startListening()
                             setUpIconListen()
                         }
@@ -250,34 +257,18 @@ class FragmentVoice : Fragment() {
             override fun onError(error: Int) {
                 isListening = false
                 handler.removeCallbacks(stopBecauseNoNewText)
-                Log.e("STT", "onError: $error")
-
-                val textToSend = lastText
-                lastText = ""
-
-                if (textToSend.isNotEmpty()) {
-                    // Đã gửi từ stopListening rồi, chỉ cần chờ server
-                } else {
-                    setUpViewWait()
-                }
-
+                Log.d("result", "error+${speechRecognizer}")
                 recreateSpeechRecognizer()
+                setUpViewWait()
             }
 
             override fun onResults(results: Bundle?) {
                 isListening = false
                 handler.removeCallbacks(stopBecauseNoNewText)
-
                 val textToSend = lastText
                 lastText = ""
-
-                if (textToSend.isNotEmpty()) {
-                    webSocketManager.sendText(textToSend, "VI", "giongnuhanoi", 112233, 2.5f)
-                } else {
-                    setUpViewWait()
-                }
-
-                // Recreate SpeechRecognizer để tránh lỗi sau nhiều lần dùng
+                Log.d("lastText", "onPartialResults: $textToSend")
+                Log.d("result", "result")
                 recreateSpeechRecognizer()
             }
 
@@ -286,13 +277,10 @@ class FragmentVoice : Fragment() {
                     partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 val newText = texts?.firstOrNull()?.trim().orEmpty()
 
-                if (newText.isNotEmpty()) {
-                    if (newText != lastText) {
-                        lastText = newText
-                        hasAnyText = true
-                        resetNoNewTextTimer()
-                        Log.d("Data", lastText)
-                    }
+                if (newText.isNotEmpty() && newText != lastText) {
+                    lastText = newText
+                    hasAnyText = true
+                    resetNoNewTextTimer()
                 }
             }
 
@@ -322,22 +310,24 @@ class FragmentVoice : Fragment() {
 
     private fun resetNoNewTextTimer() {
         handler.removeCallbacks(stopBecauseNoNewText)
-//        handler.postDelayed(stopBecauseNoNewText, 2000)
-        handler.postDelayed(stopBecauseNoNewText, 500)
+        handler.postDelayed(stopBecauseNoNewText, 600)
     }
 
     private fun stopListening() {
         isListening = false
         handler.removeCallbacks(stopBecauseNoNewText)
+        Log.d("lasttext",lastText)
+        if (lastText.isNotEmpty()) {
+            val textToSend = lastText
+            lastText = ""
+            webSocketManager.sendText(textToSend, "VI", "giongnuhanoi", 112233, 2.5f)
+            Log.d("result", "result")
+        }
         speechRecognizer?.stopListening()
-        Log.d("lastText", lastText)
-//        webSocketManager.sendText(lastText, "VI", "giongnuhanoi", 112233, 2.5f)
     }
 
     override fun onDestroy() {
         handler.removeCallbacks(stopBecauseNoNewText)
-        speechRecognizer?.cancel()
-        speechRecognizer?.destroy()
         speechRecognizer = null
         super.onDestroy()
     }
