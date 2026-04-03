@@ -161,7 +161,6 @@ class FragmentVoice : Fragment() {
 
         if (resetIcon && isAdded) {
             startListening()
-//            setUpIconListen()
         }
     }
 
@@ -248,20 +247,17 @@ class FragmentVoice : Fragment() {
             }
 
             override fun onError(error: Int) {
-                isListening = false
-                handler.removeCallbacks(stopBecauseNoNewText)
-                Log.e("STT", "onError: $error")
-
-                val textToSend = lastText
-                lastText = ""
-
-                if (textToSend.isNotEmpty()) {
-                    // Đã gửi từ stopListening rồi, chỉ cần chờ server
-                } else {
-                    setUpViewWait()
+                if(error==8){
+                    startListening()
                 }
-
-                recreateSpeechRecognizer()
+                else{
+                    isListening = false
+                    handler.removeCallbacks(stopBecauseNoNewText)
+                    val textToSend = lastText
+                    lastText = ""
+                    setUpViewWait()
+                    recreateSpeechRecognizer()
+                }
             }
 
             override fun onResults(results: Bundle?) {
@@ -270,14 +266,6 @@ class FragmentVoice : Fragment() {
 
                 val textToSend = lastText
                 lastText = ""
-
-                if (textToSend.isNotEmpty()) {
-                    webSocketManager.sendText(textToSend, "VI", "giongnuhanoi", 112233, 2.5f)
-                } else {
-                    setUpViewWait()
-                }
-
-                // Recreate SpeechRecognizer để tránh lỗi sau nhiều lần dùng
                 recreateSpeechRecognizer()
             }
 
@@ -322,8 +310,7 @@ class FragmentVoice : Fragment() {
 
     private fun resetNoNewTextTimer() {
         handler.removeCallbacks(stopBecauseNoNewText)
-//        handler.postDelayed(stopBecauseNoNewText, 2000)
-        handler.postDelayed(stopBecauseNoNewText, 500)
+        handler.postDelayed(stopBecauseNoNewText, 1500)
     }
 
     private fun stopListening() {
@@ -331,7 +318,7 @@ class FragmentVoice : Fragment() {
         handler.removeCallbacks(stopBecauseNoNewText)
         speechRecognizer?.stopListening()
         Log.d("lastText", lastText)
-//        webSocketManager.sendText(lastText, "VI", "giongnuhanoi", 112233, 2.5f)
+        webSocketManager.sendText(lastText, "VI", "giongnuhanoi", 112233, 2.5f)
     }
 
     override fun onDestroy() {
