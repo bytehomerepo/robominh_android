@@ -24,6 +24,7 @@ class FragmentSetting : PreferenceFragmentCompat() {
         setupPreference()
     }
 
+
     private fun setupPreference() {
         val nightModePref = findPreference<SwitchPreferenceCompat>(KEY_PREF_DARK_MODE)
         nightModePref?.onPreferenceChangeListener =

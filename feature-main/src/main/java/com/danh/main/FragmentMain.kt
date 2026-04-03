@@ -41,7 +41,15 @@ class FragmentMain : Fragment() {
             val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val optionMode = prefs.getString("option_mode","Trò chuyện liên tục")
             Log.d("option", optionMode.toString())
-            findNavController().navigate(R.id.action_fragmentMain_to_fragmentVoice)
+            if(optionMode.toString()=="Trò chuyện liên tục"){
+                findNavController().navigate(R.id.action_fragmentMain_to_fragmentVoice)
+                Log.d("option", optionMode.toString())
+            }
+
+            else{
+                findNavController().navigate(R.id.action_fragmentMain_to_fragmentVoice2)
+                Log.d("option", "sai")
+            }
 
         }
         binding.btnSetting.setOnClickListener {
