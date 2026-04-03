@@ -6,14 +6,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/white"
     android:fillViewport="true"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/loginContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF"
+        android:background="@color/white"
         android:fillViewport="true"
         android:padding="24dp">
 
@@ -52,7 +52,7 @@
             android:layout_marginTop="5dp"
             android:gravity="center"
             android:text="Đăng nhập"
-            android:textColor="#111111"
+            android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Tên tài khoản:"
-            android:textColor="#111111"
+            android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
@@ -100,7 +100,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="Mật khẩu:"
-            android:textColor="#111111"
+            android:textColor="@color/white"
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
@@ -132,9 +132,8 @@
         <Button
             android:id="@+id/btn_login"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="48dp"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
             android:background="@drawable/bg_button_gradient"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
@@ -173,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="Đang đăng nhập..."
-                android:textColor="#FFFFFF"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>

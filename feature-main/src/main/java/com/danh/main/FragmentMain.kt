@@ -1,6 +1,7 @@
 package com.danh.main
 
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 
 import android.view.LayoutInflater
@@ -37,6 +38,9 @@ class FragmentMain : Fragment() {
     }
     private fun setUpViews(){
         binding.btnVoice.setOnClickListener {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val optionMode = prefs.getString("option_mode","Trò chuyện liên tục")
+            Log.d("option", optionMode.toString())
             findNavController().navigate(R.id.action_fragmentMain_to_fragmentVoice)
 
         }

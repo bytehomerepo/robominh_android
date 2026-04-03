@@ -1,0 +1,12 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="option_mode">
+        <item>Trò chuyện liên tục</item>
+        <item>Trò chuyện ngắt quãng</item>
+    </string-array>
+
+    <string-array name="option_voice">
+        <item>Nam</item>
+        <item>Nữ</item>
+    </string-array>
+</resources>

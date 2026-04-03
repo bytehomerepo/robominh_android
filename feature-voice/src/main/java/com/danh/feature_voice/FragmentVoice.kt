@@ -255,11 +255,24 @@ class FragmentVoice : Fragment() {
             }
 
             override fun onError(error: Int) {
-                isListening = false
-                handler.removeCallbacks(stopBecauseNoNewText)
-                Log.d("result", "error+${speechRecognizer}")
-                recreateSpeechRecognizer()
-                setUpViewWait()
+                if(error==8){
+                    isListening=false
+                    handler.removeCallbacks(stopBecauseNoNewText)
+                    lastText = ""
+                    recreateSpeechRecognizer()
+                    Log.d("result", "error+${speechRecognizer}")
+                    recreateSpeechRecognizer()
+                    startListening()
+                }else{
+                    isListening = false
+                    handler.removeCallbacks(stopBecauseNoNewText)
+                    lastText = ""
+                    recreateSpeechRecognizer()
+                    Log.d("result", "error+${speechRecognizer}")
+                    recreateSpeechRecognizer()
+                    setUpViewWait()
+                }
+
             }
 
             override fun onResults(results: Bundle?) {
@@ -282,6 +295,7 @@ class FragmentVoice : Fragment() {
                     hasAnyText = true
                     resetNoNewTextTimer()
                 }
+                Log.d("result",lastText)
             }
 
             override fun onEvent(eventType: Int, params: Bundle?) {}
@@ -310,20 +324,22 @@ class FragmentVoice : Fragment() {
 
     private fun resetNoNewTextTimer() {
         handler.removeCallbacks(stopBecauseNoNewText)
-        handler.postDelayed(stopBecauseNoNewText, 600)
+        handler.postDelayed(stopBecauseNoNewText, 1500)
     }
 
     private fun stopListening() {
         isListening = false
         handler.removeCallbacks(stopBecauseNoNewText)
         Log.d("lasttext",lastText)
+        speechRecognizer?.stopListening()
         if (lastText.isNotEmpty()) {
             val textToSend = lastText
             lastText = ""
             webSocketManager.sendText(textToSend, "VI", "giongnuhanoi", 112233, 2.5f)
-            Log.d("result", "result")
+            Log.d("result","Dữ liệu được gửi lên server: "+textToSend)
+            Log.d("result","lasttext ${lastText}")
         }
-        speechRecognizer?.stopListening()
+
     }
 
     override fun onDestroy() {
