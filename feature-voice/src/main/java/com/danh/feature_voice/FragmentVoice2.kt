@@ -282,8 +282,7 @@ class FragmentVoice2 : Fragment() {
                     lastText = ""
                     recreateSpeechRecognizer()
                     Log.d("result", "error+${speechRecognizer}")
-                    recreateSpeechRecognizer()
-                    setUpViewWait()
+
             }
 
             override fun onResults(results: Bundle?) {

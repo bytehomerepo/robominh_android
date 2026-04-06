@@ -6,7 +6,7 @@
     </string-array>
 
     <string-array name="option_voice">
-<!--        <item>Nam</item>-->
+        <item>Nam</item>
         <item>Nữ</item>
     </string-array>
 </resources>
