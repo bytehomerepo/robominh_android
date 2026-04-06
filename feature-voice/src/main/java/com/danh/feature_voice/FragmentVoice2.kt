@@ -190,9 +190,6 @@ class FragmentVoice2 : Fragment() {
     @UnstableApi
     private fun receiveText(type: String?, text: String?, audioUrl: String?) {
         if (!audioUrl.isNullOrEmpty()) {
-            Log.d("WS", "type=$type")
-            Log.d("WS", "text=$text")
-            Log.d("Đã nhận", "audioUrl=$audioUrl")
             playAudioStream(audioUrl)
         }
     }
@@ -227,8 +224,9 @@ class FragmentVoice2 : Fragment() {
                         Player.STATE_ENDED -> {
                             Log.d("AudioStream", "STATE_ENDED")
                             stopAudioStream(false)
-                            startListening()
-                            setUpIconListen()
+                            handler.postDelayed({
+                                setUpViewWait()
+                            }, 600)
                         }
 
                         Player.STATE_IDLE -> {
