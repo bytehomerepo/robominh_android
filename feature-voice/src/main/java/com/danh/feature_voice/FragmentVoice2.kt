@@ -1,4 +1,5 @@
 package com.danh.feature_voice
+
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,7 +18,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.OptIn
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -30,9 +31,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultLoadControl
 import kotlinx.coroutines.launch
 import com.danh.core_network.data.WebSocketManager
+import com.danh.feature_voice.databinding.FragmentVoice2Binding
 import com.danh.myapplication.data.TokenManager
-class FragmentVoice : Fragment() {
-    private lateinit var binding: FragmentVoiceBinding
+
+class FragmentVoice2 : Fragment() {
+    private lateinit var binding: FragmentVoice2Binding
     private var videoPlayer: ExoPlayer? = null
     private var audioPlayer: ExoPlayer? = null
     private var speechRecognizer: SpeechRecognizer? = null
@@ -46,6 +49,7 @@ class FragmentVoice : Fragment() {
             stopListening()
         }
     }
+
     private val requestPermission: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startListening()
@@ -61,7 +65,7 @@ class FragmentVoice : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentVoiceBinding.inflate(inflater, container, false)
+        binding = FragmentVoice2Binding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -69,15 +73,14 @@ class FragmentVoice : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initVideoPlayer()
+        setUpViewHello()
         setWebSocket()
         setUpData()
-        setUpViewStartOrBye("aitest")
-
     }
-    private fun setUpViewStartOrBye(url:String){
+    private fun setUpViewHello(){
         setUpIconVoice()
         binding.viewBlockTouch.visibility = View.VISIBLE
-        mediaPlayer= MediaPlayer.create(requireContext(),resources.getIdentifier(url, "raw", requireContext().packageName))
+        mediaPlayer= MediaPlayer.create(requireContext(),R.raw.aitest)
         handler.postDelayed({
             mediaPlayer?.start()
             mediaPlayer?.setOnCompletionListener {
@@ -187,9 +190,6 @@ class FragmentVoice : Fragment() {
     @UnstableApi
     private fun receiveText(type: String?, text: String?, audioUrl: String?) {
         if (!audioUrl.isNullOrEmpty()) {
-            Log.d("WS", "type=$type")
-            Log.d("WS", "text=$text")
-            Log.d("Đã nhận", "audioUrl=$audioUrl")
             playAudioStream(audioUrl)
         }
     }
@@ -224,8 +224,9 @@ class FragmentVoice : Fragment() {
                         Player.STATE_ENDED -> {
                             Log.d("AudioStream", "STATE_ENDED")
                             stopAudioStream(false)
-                            startListening()
-                            setUpIconListen()
+                            handler.postDelayed({
+                                setUpViewWait()
+                            }, 600)
                         }
 
                         Player.STATE_IDLE -> {
@@ -275,29 +276,12 @@ class FragmentVoice : Fragment() {
 
             }
 
-            @OptIn(UnstableApi::class)
             override fun onError(error: Int) {
-                if(error==8){
-                    isListening=false
-                    handler.removeCallbacks(stopBecauseNoNewText)
-                    lastText = ""
-                    recreateSpeechRecognizer()
-                    Log.d("result", error.toString())
-                    startListening()
-                }else if(error==7){
                     isListening = false
                     handler.removeCallbacks(stopBecauseNoNewText)
                     lastText = ""
                     recreateSpeechRecognizer()
-                    setUpViewStartOrBye("byeai")
-                } else{
-                    isListening = false
-                    handler.removeCallbacks(stopBecauseNoNewText)
-                    lastText = ""
-                    recreateSpeechRecognizer()
-                    Log.d("result", error.toString())
-                    setUpViewWait()
-                }
+                    Log.d("result", "error+${speechRecognizer}")
 
             }
 

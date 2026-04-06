@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/fragmentMain"
         android:name="com.danh.main.FragmentMain"
-        android:label="fragment_main"
+        android:label="Màn hình chính"
         tools:layout="@layout/fragment_main" >
         <deepLink app:uri="myapp://main" />
         <action
@@ -21,18 +21,25 @@
         <action
             android:id="@+id/action_fragmentMain_to_fragmentSetting"
 
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"
+
             app:destination="@id/fragmentSetting" />
+        <action
+            android:id="@+id/action_fragmentMain_to_fragmentVoice2"
+            app:destination="@id/fragmentVoice2" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSetting"
         android:name="com.danh.feature_setting.FragmentSetting"
-        android:label="FragmentSetting" />
+        android:label="Cài đặt" />
     <fragment
+
         android:id="@+id/fragmentVoice"
         android:name="com.danh.feature_voice.FragmentVoice"
-        android:label="FragmentVoice" />
+        tools:layout="@layout/fragment_voice"
+        android:label="Nói chuyện liên tục"
+        />
+    <fragment
+        android:id="@+id/fragmentVoice2"
+        android:name="com.danh.feature_voice.FragmentVoice2"
+        android:label="Nói chuyện rời rạc" />
 </navigation>

@@ -1,4 +1,9 @@
 <resources>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="messages_header">Cài đặt</string>
+    <string name="title_voice">Tuỳ chọn giọng nói</string>
+    <string name="title_text">Tuỳ chọn văn bản</string>
+    <string name="title_language">Ngôn ngữ</string>
+    <string name="title_mode">Tuỳ chọn chế độ</string>
+    <!-- Sync Preferences -->
+    <string name="title_dark_mode">Chế độ tối</string>
 </resources>

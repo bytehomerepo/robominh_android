@@ -45,8 +45,6 @@ class WebSocketManager {
                     val type = json.optString("type")
                     val messageText = json.optString("text")
                     val audioUrl = json.optString("audioUrl", null)
-//
-//                    receiveText(type, messageText, audioUrl)
 
                     onReceiveText?.invoke(type, messageText, audioUrl)
                 } catch (e: Exception) {
@@ -91,6 +89,7 @@ class WebSocketManager {
         }
 
         webSocket?.send(json.toString())
+        Log.d("lasttext","da gửi")
     }
 
     fun disconnect() {
