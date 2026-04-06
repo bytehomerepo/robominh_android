@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.preference.ListPreference
@@ -24,7 +25,10 @@ class FragmentSetting : PreferenceFragmentCompat() {
         setupPreference()
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).supportActionBar?.show()
+    }
     private fun setupPreference() {
         val nightModePref = findPreference<SwitchPreferenceCompat>(KEY_PREF_DARK_MODE)
         nightModePref?.onPreferenceChangeListener =

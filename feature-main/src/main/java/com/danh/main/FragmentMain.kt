@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -25,7 +26,10 @@ class FragmentMain : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpViews()
     }
-
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).supportActionBar?.hide()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -1,5 +1,4 @@
 package com.danh.feature_voice
-
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -27,6 +27,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import kotlinx.coroutines.launch
 import com.danh.core_network.data.WebSocketManager
 import com.danh.myapplication.data.TokenManager
@@ -45,7 +48,10 @@ class FragmentVoice : Fragment() {
             stopListening()
         }
     }
-
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).supportActionBar?.show()
+    }
     private val requestPermission: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startListening()
@@ -72,6 +78,7 @@ class FragmentVoice : Fragment() {
         setUpViewWait()
         setWebSocket()
         setUpData()
+
     }
 
     private fun initVideoPlayer() {

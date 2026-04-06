@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -74,7 +75,10 @@ class FragmentVoice2 : Fragment() {
         setWebSocket()
         setUpData()
     }
-
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).supportActionBar?.show()
+    }
     private fun initVideoPlayer() {
         if (videoPlayer == null) {
             videoPlayer = ExoPlayer.Builder(requireContext()).build().also {
