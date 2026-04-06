@@ -3,6 +3,7 @@ package com.danh.feature_voice
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -42,6 +43,7 @@ class FragmentVoice2 : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private var lastText = ""
     private var hasAnyText = false
+    private var mediaPlayer: MediaPlayer? = null
     private val stopBecauseNoNewText = Runnable {
         if (isListening) {
             stopListening()
@@ -71,13 +73,30 @@ class FragmentVoice2 : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initVideoPlayer()
-        setUpViewWait()
+        setUpViewHello()
         setWebSocket()
         setUpData()
     }
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).supportActionBar?.show()
+    private fun setUpViewHello(){
+        setUpIconVoice()
+        binding.viewBlockTouch.visibility = View.VISIBLE
+        mediaPlayer= MediaPlayer.create(requireContext(),R.raw.aitest)
+        handler.postDelayed({
+            mediaPlayer?.start()
+            mediaPlayer?.setOnCompletionListener {
+                it.release()
+                mediaPlayer = null
+                binding.viewBlockTouch.visibility = View.GONE
+                if (isAdded) {
+                    setUpViewWait()
+                }
+            }
+        }, 1000)
+        mediaPlayer?.setOnCompletionListener {
+            it.release()        // giải phóng audio
+            mediaPlayer = null
+            setUpViewWait()
+        }
     }
     private fun initVideoPlayer() {
         if (videoPlayer == null) {

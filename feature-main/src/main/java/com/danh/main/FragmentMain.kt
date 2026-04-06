@@ -15,8 +15,8 @@ import com.danh.main.databinding.FragmentMainBinding
 
 
 class FragmentMain : Fragment() {
-    private lateinit var binding: FragmentMainBinding
-
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -35,9 +35,9 @@ class FragmentMain : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View ?{
 
-        binding = FragmentMainBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentMainBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
     private fun setUpViews(){
@@ -59,5 +59,9 @@ class FragmentMain : Fragment() {
         binding.btnSetting.setOnClickListener {
             findNavController().navigate(R.id.action_fragmentMain_to_fragmentSetting)
         }
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
