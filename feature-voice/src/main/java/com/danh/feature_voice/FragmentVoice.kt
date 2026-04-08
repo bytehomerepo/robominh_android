@@ -46,6 +46,16 @@ class FragmentVoice : Fragment() {
             stopListening()
         }
     }
+    private fun stopLocalMediaPlayer() {
+        mediaPlayer?.let {
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.reset()
+            it.release()
+        }
+        mediaPlayer = null
+    }
     private val requestPermission: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startListening()
@@ -71,7 +81,7 @@ class FragmentVoice : Fragment() {
         initVideoPlayer()
         setWebSocket()
         setUpData()
-        setUpViewStartOrBye("aitest")
+        setUpViewStartOrBye("aihi")
 
     }
     private fun setUpViewStartOrBye(url:String){
@@ -89,11 +99,6 @@ class FragmentVoice : Fragment() {
                 }
             }
         }, 1000)
-        mediaPlayer?.setOnCompletionListener {
-            it.release()        // giải phóng audio
-            mediaPlayer = null
-            setUpViewWait()
-        }
     }
     private fun initVideoPlayer() {
         if (videoPlayer == null) {
@@ -388,6 +393,10 @@ class FragmentVoice : Fragment() {
 
         binding.playerView.player = null
         super.onDestroyView()
+    }
+    override fun onStop() {
+        super.onStop()
+        stopLocalMediaPlayer()
     }
     private fun recreateSpeechRecognizer() {
         speechRecognizer?.cancel()
