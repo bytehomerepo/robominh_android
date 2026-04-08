@@ -42,16 +42,6 @@ class FragmentVoice2 : Fragment() {
     private var lastText = ""
     private val handler = Handler(Looper.getMainLooper())
     private var mediaPlayer: MediaPlayer? = null
-    private fun stopLocalMediaPlayer() {
-        mediaPlayer?.let {
-            if (it.isPlaying) {
-                it.stop()
-            }
-            it.reset()
-            it.release()
-        }
-        mediaPlayer = null
-    }
     private val stopBecauseNoNewText = Runnable {
         if (isListening) {
             stopListening()
@@ -99,7 +89,7 @@ class FragmentVoice2 : Fragment() {
                     setUpViewWait()
                 }
             }
-        }, 1000)
+        }, 900)
     }
     private fun initVideoPlayer() {
         if (videoPlayer == null) {
@@ -299,6 +289,7 @@ class FragmentVoice2 : Fragment() {
                                 lastText = newText
                                 resetNoNewTextTimer()
                             }
+                            Log.d("result",lastText)
                         }
 
                         override fun onEvent(eventType: Int, params: Bundle?) {}

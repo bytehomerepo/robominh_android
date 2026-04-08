@@ -1,4 +1,5 @@
 package com.danh.feature_voice
+
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -31,31 +32,22 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import kotlinx.coroutines.launch
 import com.danh.core_network.data.WebSocketManager
 import com.danh.myapplication.data.TokenManager
+
 class FragmentVoice : Fragment() {
     private lateinit var binding: FragmentVoiceBinding
     private var videoPlayer: ExoPlayer? = null
     private var audioPlayer: ExoPlayer? = null
     private var speechRecognizer: SpeechRecognizer? = null
     private var isListening = false
-    private val handler = Handler(Looper.getMainLooper())
     private var lastText = ""
-    private var hasAnyText = false
+    private val handler = Handler(Looper.getMainLooper())
     private var mediaPlayer: MediaPlayer? = null
     private val stopBecauseNoNewText = Runnable {
         if (isListening) {
             stopListening()
         }
     }
-    private fun stopLocalMediaPlayer() {
-        mediaPlayer?.let {
-            if (it.isPlaying) {
-                it.stop()
-            }
-            it.reset()
-            it.release()
-        }
-        mediaPlayer = null
-    }
+
     private val requestPermission: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) startListening()
@@ -80,15 +72,16 @@ class FragmentVoice : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initVideoPlayer()
         setWebSocket()
-        setUpData()
-        setUpViewStartOrBye("aihi")
-
+        initSpeechRecognizer()
+        setUpViewHelloOrBye("aihi")
     }
-    private fun setUpViewStartOrBye(url:String){
+    private fun setUpViewHelloOrBye(fileName:String){
+        val resId = resources.getIdentifier(fileName, "raw", requireContext().packageName)
         setUpIconVoice()
         binding.viewBlockTouch.visibility = View.VISIBLE
-        mediaPlayer= MediaPlayer.create(requireContext(),resources.getIdentifier(url, "raw", requireContext().packageName))
+        mediaPlayer= MediaPlayer.create(requireContext(),resId)
         handler.postDelayed({
+            if (!isAdded) return@postDelayed
             mediaPlayer?.start()
             mediaPlayer?.setOnCompletionListener {
                 it.release()
@@ -98,7 +91,7 @@ class FragmentVoice : Fragment() {
                     setUpViewWait()
                 }
             }
-        }, 1000)
+        }, 900)
     }
     private fun initVideoPlayer() {
         if (videoPlayer == null) {
@@ -109,6 +102,22 @@ class FragmentVoice : Fragment() {
             }
         }
     }
+
+    @UnstableApi
+    private fun initAudioAi() {
+        if (audioPlayer == null) {
+            val loadControl = DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                    1000,   // minBufferMs — chỉ cần 1 giây là phát
+                    10000,  // maxBufferMs
+                    500,    // bufferForPlaybackMs — chỉ cần 500ms để bắt đầu
+                    500     // bufferForPlaybackAfterRebufferMs
+                )
+                .build()
+            audioPlayer = ExoPlayer.Builder(requireContext()).setLoadControl(loadControl).build()
+        }
+    }
+
     private fun showVideo(rawRes: Int) {
         val uri = "android.resource://${requireContext().packageName}/$rawRes".toUri()
         videoPlayer?.apply {
@@ -159,8 +168,10 @@ class FragmentVoice : Fragment() {
             )
         }
         binding.playerView.setOnClickListener {
+
             if (audioPlayer?.isPlaying == true) {
                 stopAudioStream()
+                startListening()
                 return@setOnClickListener
             }
 
@@ -176,45 +187,29 @@ class FragmentVoice : Fragment() {
         }
     }
 
-    private fun stopAudioStream(resetIcon: Boolean = true) {
+    private fun stopAudioStream() {
         audioPlayer?.let { player ->
             player.stop()
             player.clearMediaItems()
             player.release()
         }
         audioPlayer = null
-
-        if (resetIcon && isAdded) {
-            startListening()
-        }
     }
 
     @UnstableApi
     private fun receiveText(type: String?, text: String?, audioUrl: String?) {
         if (!audioUrl.isNullOrEmpty()) {
-            Log.d("WS", "type=$type")
-            Log.d("WS", "text=$text")
-            Log.d("Đã nhận", "audioUrl=$audioUrl")
             playAudioStream(audioUrl)
         }
     }
 
     @UnstableApi
     private fun playAudioStream(url: String) {
-        stopAudioStream(resetIcon = false)
-        val loadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(
-                1000,   // minBufferMs — chỉ cần 1 giây là phát
-                10000,  // maxBufferMs
-                500,    // bufferForPlaybackMs — chỉ cần 500ms để bắt đầu
-                500     // bufferForPlaybackAfterRebufferMs
-            )
-            .build()
-        audioPlayer = ExoPlayer.Builder(requireContext()).setLoadControl(loadControl).build().also { exoPlayer ->
+        initAudioAi()
+        audioPlayer.also { exoPlayer ->
             val mediaItem = MediaItem.fromUri(url)
-            exoPlayer.setMediaItem(mediaItem)
-
-            exoPlayer.addListener(object : Player.Listener {
+            exoPlayer?.setMediaItem(mediaItem)
+            exoPlayer?.addListener(object : Player.Listener {
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     when (playbackState) {
@@ -227,12 +222,9 @@ class FragmentVoice : Fragment() {
                         }
 
                         Player.STATE_ENDED -> {
-                            Log.d("AudioStream", "STATE_ENDED")
-                            stopAudioStream(false)
+                            stopAudioStream()
                             startListening()
-                            setUpIconListen()
                         }
-
                         Player.STATE_IDLE -> {
                             Log.d("AudioStream", "STATE_IDLE")
                         }
@@ -240,8 +232,6 @@ class FragmentVoice : Fragment() {
                 }
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    Log.d("AudioStream", "isPlaying=$isPlaying")
-
                     if (isPlaying) {
                         setUpIconVoice()
                     }
@@ -249,138 +239,135 @@ class FragmentVoice : Fragment() {
 
                 override fun onPlayerError(error: PlaybackException) {
                     Log.e("AudioStream", "Lỗi phát audio stream", error)
-                    Toast.makeText(requireContext(), "Không phát được audio", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        requireContext(),
+                        "Không phát được audio",
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                     stopAudioStream()
                 }
             })
 
-            exoPlayer.prepare()
-            exoPlayer.playWhenReady = true
+            exoPlayer?.prepare()
+            exoPlayer?.playWhenReady = true
         }
     }
 
-    private fun setUpData() {
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(requireContext())
-        speechRecognizer?.setRecognitionListener(object : RecognitionListener {
+    private fun initSpeechRecognizer() {
+        if (speechRecognizer == null) {
+            speechRecognizer =
+                SpeechRecognizer.createSpeechRecognizer(requireContext()).also { recognizer ->
+                    recognizer.setRecognitionListener(object : RecognitionListener {
+                        override fun onReadyForSpeech(params: Bundle?) {
+                        }
 
-            override fun onReadyForSpeech(params: Bundle?) {
+                        override fun onBeginningOfSpeech() {
+                        }
 
-            }
+                        override fun onRmsChanged(rmsdB: Float) {
+                        }
 
-            override fun onBeginningOfSpeech() {
+                        override fun onBufferReceived(buffer: ByteArray?) {}
 
-            }
+                        override fun onEndOfSpeech() {
+                        }
 
-            override fun onRmsChanged(rmsdB: Float) {}
+                        override fun onError(error: Int) {
+                            stopAudioStream()
+                            stopListening()
+                            setUpViewHelloOrBye("byeai")
+                        }
 
-            override fun onBufferReceived(buffer: ByteArray?) {}
+                        override fun onResults(results: Bundle?) {
+                            val matches =
+                                results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                            Log.d("Speech", "onResults: $matches")
+                        }
 
-            override fun onEndOfSpeech() {
+                        override fun onPartialResults(partialResults: Bundle?) {
+                            val texts =
+                                partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                            val newText = texts?.firstOrNull()?.trim().orEmpty()
+                            if (newText.isNotEmpty() && newText != lastText) {
+                                lastText = newText
+                                Log.d("result",lastText)
+                                Log.d("result", lastText.length.toString())
+                                val numberText=lastText.length.toString()
+                                if(numberText.toInt()<50){
+                                    resetNoNewTextTimer(1000)
+                                }else{
+                                    resetNoNewTextTimer(2000)
+                                }
+                            }
 
-            }
+                        }
 
-            @OptIn(UnstableApi::class)
-            override fun onError(error: Int) {
-                if(error==8){
-                    isListening=false
-                    handler.removeCallbacks(stopBecauseNoNewText)
-                    lastText = ""
-                    recreateSpeechRecognizer()
-                    Log.d("result", error.toString())
-                    startListening()
-                }else if(error==7){
-                    isListening = false
-                    handler.removeCallbacks(stopBecauseNoNewText)
-                    lastText = ""
-                    recreateSpeechRecognizer()
-                    setUpViewStartOrBye("byeai")
-                } else{
-                    isListening = false
-                    handler.removeCallbacks(stopBecauseNoNewText)
-                    lastText = ""
-                    recreateSpeechRecognizer()
-                    Log.d("result", error.toString())
-                    setUpViewWait()
+                        override fun onEvent(eventType: Int, params: Bundle?) {}
+                    })
                 }
 
-            }
 
-            override fun onResults(results: Bundle?) {
-                isListening = false
-                handler.removeCallbacks(stopBecauseNoNewText)
-                val textToSend = lastText
-                lastText = ""
-                Log.d("lastText", "onPartialResults: $textToSend")
-                Log.d("result", "result")
-                recreateSpeechRecognizer()
-            }
-
-            override fun onPartialResults(partialResults: Bundle?) {
-                val texts =
-                    partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                val newText = texts?.firstOrNull()?.trim().orEmpty()
-
-                if (newText.isNotEmpty() && newText != lastText) {
-                    lastText = newText
-                    hasAnyText = true
-                    resetNoNewTextTimer()
-                }
-                Log.d("result",lastText)
-            }
-
-            override fun onEvent(eventType: Int, params: Bundle?) {}
-        })
+        }
     }
 
     private fun startListening() {
         if (isListening) return
-
+        initSpeechRecognizer()
         setUpIconListen()
-
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN")
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "vi-VN")
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
         }
-
         isListening = true
-        lastText = ""
-        hasAnyText = false
-        handler.removeCallbacks(stopBecauseNoNewText)
         speechRecognizer?.startListening(intent)
+
     }
 
-    private fun resetNoNewTextTimer() {
+    private fun resetNoNewTextTimer(time:Long) {
         handler.removeCallbacks(stopBecauseNoNewText)
-        handler.postDelayed(stopBecauseNoNewText, 1500)
+        handler.postDelayed(stopBecauseNoNewText, time)
     }
 
     private fun stopListening() {
+        if (isListening && speechRecognizer != null) {
+            speechRecognizer?.stopListening()
+            speechRecognizer?.cancel()
+            speechRecognizer?.destroy()
+            speechRecognizer = null
+        }
         isListening = false
         handler.removeCallbacks(stopBecauseNoNewText)
-        Log.d("lasttext",lastText)
-        speechRecognizer?.stopListening()
+        Log.d("lasttext", lastText)
+
         if (lastText.isNotEmpty()) {
             val textToSend = lastText
             lastText = ""
             webSocketManager.sendText(textToSend, "VI", "giongnuhanoi", 112233, 2.5f)
-            Log.d("result","Dữ liệu được gửi lên server: "+textToSend)
-            Log.d("result","lasttext ${lastText}")
+            Log.d("result", "Dữ liệu được gửi lên server: " + textToSend)
+            Log.d("result", "lasttext ${lastText}")
         }
-
     }
 
     override fun onDestroy() {
-        handler.removeCallbacks(stopBecauseNoNewText)
-        speechRecognizer = null
+        isListening = false;
+        if (speechRecognizer != null) {
+            speechRecognizer?.stopListening()
+            speechRecognizer?.cancel()
+            speechRecognizer?.destroy()
+            speechRecognizer = null
+        }
+
         super.onDestroy()
     }
-    override fun onDestroyView() {
-        handler.removeCallbacks(stopBecauseNoNewText)
 
+    override fun onDestroyView() {
         speechRecognizer?.cancel()
         speechRecognizer?.destroy()
         speechRecognizer = null
@@ -390,18 +377,10 @@ class FragmentVoice : Fragment() {
 
         videoPlayer?.release()
         videoPlayer = null
+        mediaPlayer?.release()
+        mediaPlayer=null
 
         binding.playerView.player = null
         super.onDestroyView()
-    }
-    override fun onStop() {
-        super.onStop()
-        stopLocalMediaPlayer()
-    }
-    private fun recreateSpeechRecognizer() {
-        speechRecognizer?.cancel()
-        speechRecognizer?.destroy()
-        speechRecognizer = null
-        setUpData() // tạo lại SpeechRecognizer mới
     }
 }

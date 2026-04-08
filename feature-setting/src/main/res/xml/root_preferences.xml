@@ -1,21 +1,23 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory app:title="@string/messages_header">
         <ListPreference
-            app:defaultValue="reply"
+            app:defaultValue="Nữ"
             app:entries="@array/option_voice"
             app:entryValues="@array/option_voice"
             app:key="option_voice"
             app:title="@string/title_voice"
             app:useSimpleSummaryProvider="true" />
         <ListPreference
-            app:defaultValue="chế độ liên tục"
+            app:defaultValue="Trò chuyện liên tục"
             app:entries="@array/option_mode"
             app:entryValues="@array/option_mode"
             app:key="option_mode"
             app:title="@string/title_mode"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
+            app:defaultValue="false"
             app:key="dark_mode"
             app:title="@string/title_dark_mode" />
     </PreferenceCategory>

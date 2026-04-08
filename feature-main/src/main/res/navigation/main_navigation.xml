@@ -26,6 +26,9 @@
         <action
             android:id="@+id/action_fragmentMain_to_fragmentVoice2"
             app:destination="@id/fragmentVoice2" />
+        <action
+            android:id="@+id/action_fragmentMain_to_fragmentVoice3"
+            app:destination="@id/fragmentVoice3" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSetting"
@@ -42,4 +45,8 @@
         android:id="@+id/fragmentVoice2"
         android:name="com.danh.feature_voice.FragmentVoice2"
         android:label="Nói chuyện rời rạc" />
+    <fragment
+        android:id="@+id/fragmentVoice3"
+        android:name="com.danh.feature_voice.FragmentVoice3"
+        android:label="FragmentVoice3" />
 </navigation>
