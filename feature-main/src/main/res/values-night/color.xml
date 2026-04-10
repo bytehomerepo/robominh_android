@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
-    <color name="background">#ccc</color>
+    <color name="nenngoai">#0c205b</color>
+    <color name="nentrong">#0e41ac</color>
+    <color name="color_icon">#f6fafc</color>
+    <color name="nennho">#0f2a76</color>
+    <color name="chu">#7cc3f5</color>
+    <color name="kitu">#f6fafc</color>
 </resources>

@@ -42,6 +42,7 @@ class FragmentVoice : Fragment() {
     private var lastText = ""
     private val handler = Handler(Looper.getMainLooper())
     private var mediaPlayer: MediaPlayer? = null
+    private var audioPlayerListener: Player.Listener? = null
     private val stopBecauseNoNewText = Runnable {
         if (isListening) {
             stopListening()
@@ -141,28 +142,29 @@ class FragmentVoice : Fragment() {
                 url = "ws://118.70.187.211:4000?token=$token",
                 token = token,
                 onConnected = {
-                    requireActivity().runOnUiThread {
-
+                    activity?.runOnUiThread {
+                        if (!isAdded || view == null) return@runOnUiThread
                     }
                 },
                 onMessage = { message ->
-                    requireActivity().runOnUiThread {
-
+                    activity?.runOnUiThread {
+                        if (!isAdded || view == null) return@runOnUiThread
                     }
                 },
                 onReceiveText = { type, text, audioUrl ->
-                    requireActivity().runOnUiThread {
+                    activity?.runOnUiThread {
+                        if (!isAdded || view == null) return@runOnUiThread
                         receiveText(type, text, audioUrl)
                     }
                 },
                 onClosed = { code, reason ->
-                    requireActivity().runOnUiThread {
-
+                    activity?.runOnUiThread {
+                        if (!isAdded || view == null) return@runOnUiThread
                     }
                 },
                 onFailure = { error ->
-                    requireActivity().runOnUiThread {
-
+                    activity?.runOnUiThread {
+                        if (!isAdded || view == null) return@runOnUiThread
                     }
                 }
             )
@@ -206,51 +208,49 @@ class FragmentVoice : Fragment() {
     @UnstableApi
     private fun playAudioStream(url: String) {
         initAudioAi()
-        audioPlayer.also { exoPlayer ->
+        audioPlayerListener?.let { audioPlayer?.removeListener(it) }
+        audioPlayerListener = object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                when (playbackState) {
+                    Player.STATE_BUFFERING -> {
+                        Log.d("AudioStream", "STATE_BUFFERING")
+                    }
+                    Player.STATE_READY -> {
+                        Log.d("AudioStream", "STATE_READY")
+                    }
+                    Player.STATE_ENDED -> {
+                        stopAudioStream()
+                        startListening()
+                    }
+                    Player.STATE_IDLE -> {
+                        Log.d("AudioStream", "STATE_IDLE")
+                    }
+                }
+            }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) {
+                    setUpIconVoice()
+                }
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                Log.e("AudioStream", "Lỗi phát audio stream", error)
+                Toast.makeText(
+                    requireContext(),
+                    "Không phát được audio",
+                    Toast.LENGTH_SHORT
+                ).show()
+                stopAudioStream()
+            }
+        }
+
+        audioPlayer?.also { exoPlayer ->
+            exoPlayer.addListener(audioPlayerListener!!)
             val mediaItem = MediaItem.fromUri(url)
-            exoPlayer?.setMediaItem(mediaItem)
-            exoPlayer?.addListener(object : Player.Listener {
-
-                override fun onPlaybackStateChanged(playbackState: Int) {
-                    when (playbackState) {
-                        Player.STATE_BUFFERING -> {
-                            Log.d("AudioStream", "STATE_BUFFERING")
-                        }
-
-                        Player.STATE_READY -> {
-                            Log.d("AudioStream", "STATE_READY")
-                        }
-
-                        Player.STATE_ENDED -> {
-                            stopAudioStream()
-                            startListening()
-                        }
-                        Player.STATE_IDLE -> {
-                            Log.d("AudioStream", "STATE_IDLE")
-                        }
-                    }
-                }
-
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    if (isPlaying) {
-                        setUpIconVoice()
-                    }
-                }
-
-                override fun onPlayerError(error: PlaybackException) {
-                    Log.e("AudioStream", "Lỗi phát audio stream", error)
-                    Toast.makeText(
-                        requireContext(),
-                        "Không phát được audio",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                    stopAudioStream()
-                }
-            })
-
-            exoPlayer?.prepare()
-            exoPlayer?.playWhenReady = true
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.prepare()
+            exoPlayer.playWhenReady = true
         }
     }
 
@@ -274,6 +274,7 @@ class FragmentVoice : Fragment() {
                         }
 
                         override fun onError(error: Int) {
+                            webSocketManager.disConnectUser( "VI", "giongnuhanoi", 112233, 2.5f)
                             stopAudioStream()
                             stopListening()
                             setUpViewHelloOrBye("byeai")
@@ -379,7 +380,8 @@ class FragmentVoice : Fragment() {
         videoPlayer = null
         mediaPlayer?.release()
         mediaPlayer=null
-
+        webSocketManager.disconnect()
+        handler.removeCallbacksAndMessages(null)
         binding.playerView.player = null
         super.onDestroyView()
     }

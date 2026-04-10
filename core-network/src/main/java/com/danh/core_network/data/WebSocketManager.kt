@@ -89,7 +89,24 @@ class WebSocketManager {
         }
 
         webSocket?.send(json.toString())
-        Log.d("lasttext","da gửi")
+        Log.d("lasttext", "da gửi")
+    }
+
+    fun disConnectUser(
+        language: String,
+        voice: String,
+        timestamp: Long,
+        duration: Float
+    ) {
+        val json = JSONObject().apply {
+            put("text", "disconectuser")
+            put("language", language)
+            put("voice", voice)
+            put("timestamp", timestamp)
+            put("duration", duration)
+        }
+
+        webSocket?.send(json.toString())
     }
 
     fun disconnect() {
