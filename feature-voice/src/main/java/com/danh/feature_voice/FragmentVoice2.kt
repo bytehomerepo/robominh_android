@@ -74,13 +74,15 @@ class FragmentVoice2 : Fragment() {
         initVideoPlayer()
         setWebSocket()
         initSpeechRecognizer()
-        setUpViewStart()
+        setUpViewHelloOrBye("aihi")
     }
-    private fun setUpViewStart(){
+    private fun setUpViewHelloOrBye(fileName:String){
+        val resId = resources.getIdentifier(fileName, "raw", requireContext().packageName)
         setUpIconVoice()
         binding.viewBlockTouch.visibility = View.VISIBLE
-        mediaPlayer= MediaPlayer.create(requireContext(),R.raw.aihi)
+        mediaPlayer= MediaPlayer.create(requireContext(),resId)
         handler.postDelayed({
+            if (!isAdded) return@postDelayed
             mediaPlayer?.start()
             mediaPlayer?.setOnCompletionListener {
                 it.release()
@@ -206,53 +208,6 @@ class FragmentVoice2 : Fragment() {
     private fun playAudioStream(url: String) {
         initAudioAi()
         audioPlayerListener?.let { audioPlayer?.removeListener(it) }
-//        audioPlayer.also { exoPlayer ->
-//            val mediaItem = MediaItem.fromUri(url)
-//            exoPlayer?.setMediaItem(mediaItem)
-//            exoPlayer?.addListener(object : Player.Listener {
-//
-//                override fun onPlaybackStateChanged(playbackState: Int) {
-//                    when (playbackState) {
-//                        Player.STATE_BUFFERING -> {
-//                            Log.d("AudioStream", "STATE_BUFFERING")
-//                        }
-//
-//                        Player.STATE_READY -> {
-//                            Log.d("AudioStream", "STATE_READY")
-//                        }
-//
-//                        Player.STATE_ENDED -> {
-//                            Log.d("AudioStream", "STATE_ENDED")
-//                            stopAudioStream()
-//                            setUpViewWait()
-//                        }
-//                        Player.STATE_IDLE -> {
-//                            Log.d("AudioStream", "STATE_IDLE")
-//                        }
-//                    }
-//                }
-//
-//                override fun onIsPlayingChanged(isPlaying: Boolean) {
-//                    if (isPlaying) {
-//                        setUpIconVoice()
-//                    }
-//                }
-//
-//                override fun onPlayerError(error: PlaybackException) {
-//                    Log.e("AudioStream", "Lỗi phát audio stream", error)
-//                    Toast.makeText(
-//                        requireContext(),
-//                        "Không phát được audio",
-//                        Toast.LENGTH_SHORT
-//                    )
-//                        .show()
-//                    stopAudioStream()
-//                }
-//            })
-//
-//            exoPlayer?.prepare()
-//            exoPlayer?.playWhenReady = true
-//        }
         audioPlayerListener = object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 when (playbackState) {
@@ -320,7 +275,8 @@ class FragmentVoice2 : Fragment() {
                         override fun onError(error: Int) {
                             webSocketManager.disConnectUser( "VI", "giongnuhanoi", 112233, 2.5f)
                             stopAudioStream()
-                            setUpViewWait()
+                            stopListening()
+                            setUpViewHelloOrBye("byeai")
                         }
 
                         override fun onResults(results: Bundle?) {

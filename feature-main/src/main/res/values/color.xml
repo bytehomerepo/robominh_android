@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="nenngoai">#eaf9fe</color>
+    <color name="nenngoai">#ffffff</color>
     <color name="nentrong">#e9f6fe</color>
     <color name="color_icon">#f6fafc</color>
     <color name="nennho">#399df4</color>
     <color name="chu">#0868be</color>
-    <color name="kitu">#f6fafc</color>
+    <color name="kitu">#000000</color>
 </resources>

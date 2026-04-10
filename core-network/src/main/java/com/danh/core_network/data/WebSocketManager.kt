@@ -113,10 +113,4 @@ class WebSocketManager {
         webSocket?.close(1000, "Client closed")
         webSocket = null
     }
-
-//    private fun receiveText(type: String, text: String, audioUrl: String?) {
-//        Log.d("WebSocket", "type = $type")
-//        Log.d("WebSocket", "text = $text")
-//        Log.d("WebSocket", "audioUrl = $audioUrl")
-//    }
 }
