@@ -77,6 +77,7 @@ class FragmentVoice : Fragment() {
         setUpViewHelloOrBye("aihi")
     }
     private fun setUpViewHelloOrBye(fileName:String){
+
         val resId = resources.getIdentifier(fileName, "raw", requireContext().packageName)
         setUpIconVoice()
         binding.viewBlockTouch.visibility = View.VISIBLE
@@ -89,6 +90,7 @@ class FragmentVoice : Fragment() {
                 mediaPlayer = null
                 binding.viewBlockTouch.visibility = View.GONE
                 if (isAdded) {
+                    isListening=false
                     setUpViewWait()
                 }
             }
@@ -230,6 +232,7 @@ class FragmentVoice : Fragment() {
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 if (isPlaying) {
+                    isListening=false
                     setUpIconVoice()
                 }
             }
@@ -295,7 +298,7 @@ class FragmentVoice : Fragment() {
                                 Log.d("result",lastText)
                                 Log.d("result", lastText.length.toString())
                                 val numberText=lastText.length.toString()
-                                if(numberText.toInt()<50){
+                                if(numberText.toInt()<30){
                                     resetNoNewTextTimer(1000)
                                 }else{
                                     resetNoNewTextTimer(2000)
@@ -343,7 +346,7 @@ class FragmentVoice : Fragment() {
             speechRecognizer?.destroy()
             speechRecognizer = null
         }
-        isListening = false
+       // isListening = false
         handler.removeCallbacks(stopBecauseNoNewText)
         Log.d("lasttext", lastText)
 

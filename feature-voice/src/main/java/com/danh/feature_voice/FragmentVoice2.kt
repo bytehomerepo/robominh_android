@@ -77,6 +77,7 @@ class FragmentVoice2 : Fragment() {
         setUpViewHelloOrBye("aihi")
     }
     private fun setUpViewHelloOrBye(fileName:String){
+
         val resId = resources.getIdentifier(fileName, "raw", requireContext().packageName)
         setUpIconVoice()
         binding.viewBlockTouch.visibility = View.VISIBLE
@@ -89,6 +90,7 @@ class FragmentVoice2 : Fragment() {
                 mediaPlayer = null
                 binding.viewBlockTouch.visibility = View.GONE
                 if (isAdded) {
+                    isListening=false
                     setUpViewWait()
                 }
             }
@@ -229,6 +231,7 @@ class FragmentVoice2 : Fragment() {
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 if (isPlaying) {
+                    isListening=false
                     setUpIconVoice()
                 }
             }
@@ -291,7 +294,13 @@ class FragmentVoice2 : Fragment() {
                             val newText = texts?.firstOrNull()?.trim().orEmpty()
                             if (newText.isNotEmpty() && newText != lastText) {
                                 lastText = newText
-                                resetNoNewTextTimer()
+                                val numberText=lastText.length.toString()
+                                Log.d("result", lastText.length.toString())
+                                if(numberText.toInt()<30){
+                                    resetNoNewTextTimer(1000)
+                                }else{
+                                    resetNoNewTextTimer(2000)
+                                }
                             }
                             Log.d("result",lastText)
                         }
@@ -323,9 +332,9 @@ class FragmentVoice2 : Fragment() {
 
     }
 
-    private fun resetNoNewTextTimer() {
+    private fun resetNoNewTextTimer(time:Long) {
         handler.removeCallbacks(stopBecauseNoNewText)
-        handler.postDelayed(stopBecauseNoNewText, 1500)
+        handler.postDelayed(stopBecauseNoNewText, time)
     }
 
     private fun stopListening() {
@@ -335,7 +344,7 @@ class FragmentVoice2 : Fragment() {
             speechRecognizer?.destroy()
             speechRecognizer = null
         }
-        isListening = false
+      //  isListening = false
         handler.removeCallbacks(stopBecauseNoNewText)
         Log.d("lasttext", lastText)
 
