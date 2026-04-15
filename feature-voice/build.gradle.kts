@@ -1,8 +1,10 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
 }
-
+val keyVoice= gradleLocalProperties(rootDir,providers).getProperty("VOICE_BASE_URL","")
 android {
     namespace = "com.danh.feature_voice"
     compileSdk = 36
@@ -12,6 +14,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        resValue("string", "VOICE_BASE_URL", "\""+keyVoice+"\"")
     }
 
     buildTypes {
@@ -32,12 +35,13 @@ android {
     }
     buildFeatures{
         viewBinding=true
+        buildConfig=true
     }
 }
 
 dependencies {
 
-
+    implementation("com.google.mlkit:translate:17.0.3")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation(project(":core-network"))
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")

@@ -43,6 +43,7 @@ class FragmentVoice : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private var mediaPlayer: MediaPlayer? = null
     private var audioPlayerListener: Player.Listener? = null
+
     private val stopBecauseNoNewText = Runnable {
         if (isListening) {
             stopListening()
@@ -141,7 +142,7 @@ class FragmentVoice : Fragment() {
             val token = TokenManager(requireContext().applicationContext).getToken()
             Log.d("TOKEN_MAIN", "token = $token")
             webSocketManager.connect(
-                url = "ws://118.70.187.211:4000?token=$token",
+                url = "${getString(R.string.VOICE_BASE_URL)}?token=$token",
                 token = token,
                 onConnected = {
                     activity?.runOnUiThread {
@@ -203,6 +204,7 @@ class FragmentVoice : Fragment() {
     @UnstableApi
     private fun receiveText(type: String?, text: String?, audioUrl: String?) {
         if (!audioUrl.isNullOrEmpty()) {
+            Log.d("audioUrl",audioUrl)
             playAudioStream(audioUrl)
         }
     }
@@ -346,7 +348,6 @@ class FragmentVoice : Fragment() {
             speechRecognizer?.destroy()
             speechRecognizer = null
         }
-       // isListening = false
         handler.removeCallbacks(stopBecauseNoNewText)
         Log.d("lasttext", lastText)
 

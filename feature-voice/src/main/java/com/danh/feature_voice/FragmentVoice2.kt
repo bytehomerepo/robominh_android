@@ -32,7 +32,6 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import kotlinx.coroutines.launch
 import com.danh.core_network.data.WebSocketManager
 import com.danh.myapplication.data.TokenManager
-
 class FragmentVoice2 : Fragment() {
     private lateinit var binding: FragmentVoiceBinding
     private var videoPlayer: ExoPlayer? = null
@@ -141,7 +140,7 @@ class FragmentVoice2 : Fragment() {
             val token = TokenManager(requireContext().applicationContext).getToken()
             Log.d("TOKEN_MAIN", "token = $token")
             webSocketManager.connect(
-                url = "ws://118.70.187.211:4000?token=$token",
+                url = "${getString(R.string.VOICE_BASE_URL)}?token=$token",
                 token = token,
                 onConnected = {
                     activity?.runOnUiThread {
@@ -344,7 +343,6 @@ class FragmentVoice2 : Fragment() {
             speechRecognizer?.destroy()
             speechRecognizer = null
         }
-      //  isListening = false
         handler.removeCallbacks(stopBecauseNoNewText)
         Log.d("lasttext", lastText)
 
@@ -353,7 +351,7 @@ class FragmentVoice2 : Fragment() {
             lastText = ""
             webSocketManager.sendText(textToSend, "VI", "giongnuhanoi", 112233, 2.5f)
             Log.d("result", "Dữ liệu được gửi lên server: " + textToSend)
-            Log.d("result", "lasttext ${lastText}")
+            Log.d("result", "lasttext ${lastText} ${getString(R.string.VOICE_BASE_URL)}")
         }
     }
 
