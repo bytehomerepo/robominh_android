@@ -49,7 +49,6 @@ class FragmentMain : Fragment() {
                 findNavController().navigate(R.id.action_fragmentMain_to_fragmentVoice)
                 Log.d("option", optionMode.toString())
             }
-
             else{
                 findNavController().navigate(R.id.action_fragmentMain_to_fragmentVoice2)
                 Log.d("option", "sai")

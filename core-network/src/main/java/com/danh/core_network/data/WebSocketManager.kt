@@ -89,17 +89,28 @@ class WebSocketManager {
         }
 
         webSocket?.send(json.toString())
-        Log.d("lasttext","da gửi")
+        Log.d("lasttext", "da gửi")
+    }
+
+    fun disConnectUser(
+        language: String,
+        voice: String,
+        timestamp: Long,
+        duration: Float
+    ) {
+        val json = JSONObject().apply {
+            put("text", "disconectuser")
+            put("language", language)
+            put("voice", voice)
+            put("timestamp", timestamp)
+            put("duration", duration)
+        }
+
+        webSocket?.send(json.toString())
     }
 
     fun disconnect() {
         webSocket?.close(1000, "Client closed")
         webSocket = null
     }
-
-//    private fun receiveText(type: String, text: String, audioUrl: String?) {
-//        Log.d("WebSocket", "type = $type")
-//        Log.d("WebSocket", "text = $text")
-//        Log.d("WebSocket", "audioUrl = $audioUrl")
-//    }
 }

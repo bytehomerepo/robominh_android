@@ -3,6 +3,7 @@
     <string-array name="option_mode">
         <item>Trò chuyện liên tục</item>
         <item>Trò chuyện ngắt quãng</item>
+<!--        <item>Tro chuyen si da</item>-->
     </string-array>
 
     <string-array name="option_voice">
