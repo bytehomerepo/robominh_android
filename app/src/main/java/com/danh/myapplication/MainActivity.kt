@@ -37,6 +37,11 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         setSupportActionBar(binding.toolbar)
         binding.toolbar?.setupWithNavController(navController)
+        val config = resources.configuration
+
+        Log.d("SCREEN_CHECK", "orientation = ${config.orientation}")
+        Log.d("SCREEN_CHECK", "screenWidthDp = ${config.screenWidthDp}")
+        Log.d("SCREEN_CHECK", "smallestScreenWidthDp = ${config.smallestScreenWidthDp}")
     }
 
 }

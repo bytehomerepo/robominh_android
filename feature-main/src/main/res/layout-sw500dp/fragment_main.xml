@@ -25,18 +25,19 @@
         <!-- Khối chức năng màu xám -->
         <ImageView
             android:id="@+id/imgLogo"
-            android:layout_width="150dp"
-            android:layout_height="100dp"
+            android:layout_width="220dp"
+            android:layout_height="120dp"
             android:adjustViewBounds="true"
             android:contentDescription="logo"
+            android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/logo"
             app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/panelFeature"
-            android:layout_width="650dp"
-            android:layout_height="200dp"
+            android:layout_width="720dp"
+            android:layout_height="250dp"
             android:layout_marginTop="18dp"
             android:background="@drawable/bg_feature_panel"
             android:gravity="center"
@@ -55,8 +56,8 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btn_voice"
-                    android:layout_width="200dp"
-                    android:layout_height="110dp"
+                    android:layout_width="230dp"
+                    android:layout_height="120dp"
                     android:layout_marginEnd="24dp"
                     android:foreground="?attr/selectableItemBackground"
                     app:cardBackgroundColor="@color/nennho"
@@ -71,26 +72,26 @@
                         android:padding="20dp">
 
                         <ImageView
-                            android:layout_width="38dp"
-                            android:layout_height="38dp"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
                             android:src="@drawable/ic_voice"
                             app:tint="@color/color_icon" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="14dp"
                             android:text="Nói chuyện"
                             android:textColor="@color/kitu"
-                            android:textSize="16sp"
+                            android:textSize="24sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btn_setting"
-                    android:layout_width="200dp"
-                    android:layout_height="110dp"
+                    android:layout_width="230dp"
+                    android:layout_height="120dp"
                     android:foreground="?attr/selectableItemBackground"
                     app:cardBackgroundColor="@color/nennho"
                     app:cardCornerRadius="24dp"
@@ -105,8 +106,8 @@
                         android:padding="20dp">
 
                         <ImageView
-                            android:layout_width="38dp"
-                            android:layout_height="38dp"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
                             android:src="@drawable/setting"
                             app:tint="@color/color_icon" />
 
@@ -116,7 +117,7 @@
                             android:layout_marginStart="14dp"
                             android:text="Cài đặt"
                             android:textColor="@color/kitu"
-                            android:textSize="16sp"
+                            android:textSize="24sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
