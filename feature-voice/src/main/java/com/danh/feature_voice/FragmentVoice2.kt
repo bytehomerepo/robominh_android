@@ -275,7 +275,7 @@ class FragmentVoice2 : Fragment() {
                         }
 
                         override fun onError(error: Int) {
-                            webSocketManager.disConnectUser( "VI", "giongnuhanoi", 112233, 2.5f)
+                            webSocketManager.disConnectUser( "VI", "nuhanoi", 112233, 2.5f)
                             stopAudioStream()
                             stopListening()
                             setUpViewHelloOrBye("byeai")
@@ -349,7 +349,7 @@ class FragmentVoice2 : Fragment() {
         if (lastText.isNotEmpty()) {
             val textToSend = lastText
             lastText = ""
-            webSocketManager.sendText(textToSend, "VI", "giongnuhanoi", 112233, 2.5f)
+            webSocketManager.sendText(textToSend, "VI", "nuhanoi", 112233, 2.5f)
             Log.d("result", "Dữ liệu được gửi lên server: " + textToSend)
             Log.d("result", "lasttext ${lastText} ${getString(R.string.VOICE_BASE_URL)}")
         }

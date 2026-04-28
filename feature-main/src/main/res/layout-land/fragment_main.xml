@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/nenngoai"
     android:paddingStart="20dp"
-    android:paddingTop="20dp"
+    android:paddingTop="10dp"
     android:paddingEnd="20dp"
     android:paddingBottom="20dp"
     tools:context=".FragmentMain">
@@ -25,8 +25,8 @@
         <!-- Khối chức năng màu xám -->
         <ImageView
             android:id="@+id/imgLogo"
-            android:layout_width="200dp"
-            android:layout_height="80dp"
+            android:layout_width="220dp"
+            android:layout_height="120dp"
             android:adjustViewBounds="true"
             android:contentDescription="logo"
             android:padding="8dp"
@@ -36,9 +36,9 @@
 
         <LinearLayout
             android:id="@+id/panelFeature"
-            android:layout_width="850dp"
-            android:layout_height="300dp"
-            android:layout_marginTop="28dp"
+            android:layout_width="720dp"
+            android:layout_height="250dp"
+            android:layout_marginTop="18dp"
             android:background="@drawable/bg_feature_panel"
             android:gravity="center"
             android:orientation="horizontal"
@@ -56,8 +56,8 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btn_voice"
-                    android:layout_width="290dp"
-                    android:layout_height="140dp"
+                    android:layout_width="230dp"
+                    android:layout_height="120dp"
                     android:layout_marginEnd="24dp"
                     android:foreground="?attr/selectableItemBackground"
                     app:cardBackgroundColor="@color/nennho"
@@ -90,8 +90,8 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btn_setting"
-                    android:layout_width="290dp"
-                    android:layout_height="140dp"
+                    android:layout_width="230dp"
+                    android:layout_height="120dp"
                     android:foreground="?attr/selectableItemBackground"
                     app:cardBackgroundColor="@color/nennho"
                     app:cardCornerRadius="24dp"
